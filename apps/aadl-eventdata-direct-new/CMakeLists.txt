@@ -15,9 +15,9 @@
 
 cmake_minimum_required(VERSION 3.7.2)
 
-project(aadl-event-direct C)
+project(aadl-eventdata-direct C)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/components/Receiver)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/components/Sender)
 
-DeclareCAmkESRootserver(aadl-event-direct.camkes)
+DeclareCAmkESRootserver(aadl-eventdata-direct.camkes)

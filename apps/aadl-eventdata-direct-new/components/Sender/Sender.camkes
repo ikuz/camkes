@@ -13,14 +13,13 @@
  * @TAG(DATA61_Adventium_BSD)
  */
 
-component Receiver {
-    //include "../../interfaces/counter.h";
-    include <counter.h>;
+component Sender {
+    include <queue.h>;
     control;
 
-    // ep1_in - AADL Event Port (in) representation
+    // p1_out - AADL Event Data Port (out) representation
     // NOTE: If we only need polling style receivers, we can get rid of the SendEvent
-    consumes SendEvent ep1_in_SendEvent;
-    dataport counter_t ep1_in_counter;
+    emits SendEvent p1_out_SendEvent;
+    dataport queue_t p1_out_queue;
 }
 

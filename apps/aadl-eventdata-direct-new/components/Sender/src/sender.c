@@ -19,28 +19,32 @@
 #include <sel4/sel4.h>
 #include <stdlib.h>
 #include <counter.h>
+#include <data.h>
+#include <queue.h>
 
 //------------------------------------------------------------------------------
-// Implemention of AADL Output Event Port named "ep1_out"
+// Implementation of AADL Input Event Data Port (out) named "p1_out"
+//
+// NOTE: If we only need polling style receivers, we can get rid of the SendEvent
 
-int ep1_out_aadl_send_event(void) {
-    // ep1_out_counter is a dataport (shared memory) that is written by the sender and read by the reciever(s).
-    // This counter is monotonicly increasing, but can wrap.
-    ++(*ep1_out_counter);
-    // Release memory fence - ensure subsequent write occurs after any preceeding read or write
-    ep1_out_counter_release();
-    // NOTE: If we only need polling style recivers, we can get rid of the SendEvent
-    ep1_out_SendEvent_emit();
-    return 0;
+// Assumption: only one thread is calling this and/or reading p1_in_recv_counter.
+void p1_out_aadl_event_data_send(data_t *data) {
+    queue_enqueue(p1_out_queue, data);
+    p1_out_SendEvent_emit();
 }
 
 //------------------------------------------------------------------------------
 // Testing
 
+void post_init(void) {
+    queue_init(p1_out_queue);
+}
+
 int run(void) {
 
-    counter_t i = 0;
+    int i = 0;
     int err = 0;
+    data_t data;
 
     while (1) {
 
@@ -49,16 +53,15 @@ int run(void) {
             seL4_Yield();
         }
 
-        // Send a random number of events
+        // Send a random number of data elements
         int n = (random() % 10);
         for(unsigned int j = 0; j < n; ++j){
             ++i;
-            printf("%s: sending event %" PRIuMAX "\n", get_instance_name(), i);
-            err = ep1_out_aadl_send_event();
-	    if (err) {
-                ZF_LOGE("%s: failed to raise event %" PRIuMAX ", exiting", get_instance_name(), i);
-                return err;
-            }
+            // Stage data
+            data.x = i;
+            printf("%s: sending: %d\n", get_instance_name(), data.x);
+            // Send the data
+            p1_out_aadl_event_data_send(&data);          
         }
     }
 }

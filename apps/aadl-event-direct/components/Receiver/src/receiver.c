@@ -3,16 +3,14 @@
  * Commonwealth Scientific and Industrial Research Organisation (CSIRO)
  * ABN 41 687 119 230.
  *
+ * Copyright 2019 Adventium Labs
+ * Modifications made to original
+ *
  * This software may be distributed and modified according to the terms of
  * the BSD 2-Clause license. Note that NO WARRANTY is provided.
  * See "LICENSE_BSD2.txt" for details.
  *
- * @TAG(DATA61_BSD)
- */
-
-/*
- * Copyright 2019 Adventium Labs.
- * Modifications made to original.
+ * @TAG(DATA61_Adventium_BSD)
  */
 
 #include <camkes.h>
@@ -26,6 +24,8 @@
 //
 // Callback would typicaly be avoid for safety critical systems. It is harder
 // to analyze since the callback handler is run on some arbitrary thread.
+//
+// NOTE: If we only need polling style recivers, we can get rid of the SendEvent
 
 counter_t ep1_in_recv_counter = 0;
 
@@ -66,7 +66,7 @@ static void ep1_in_handler(void *v) {
 }
 
 //------------------------------------------------------------------------------
-// Testing
+// Testing - Three tests for the different styles: callback, wait and poll.
 
 int run_callback(void) {
     return ep1_in_SendEvent_reg_callback(&ep1_in_handler, NULL);
